@@ -2,7 +2,7 @@ const fs = require("fs");
 const Xlsx = require("xlsx");
 const path = require("path");
 const fastq = require("fastq");
-const listFiles = require("./listFiles");
+const listFiles = require("./listFilesTest");
 
 const dirPath = "/home/matheusthiesen/Desktop/TestImages/";
 const noimage = path.resolve(__dirname, "SEM_IMAGEM.jpg");
@@ -62,11 +62,14 @@ function writeFile(fileDatas) {
     path.resolve(__dirname, `listagem-arquivos.csv`)
   );
 }
+var fileData = [];
 
 async function worker({ filename, noimageRead, files }) {
   const fileread = await readFile(path.resolve(dirPath, filename));
   const isExistNoImage =
     noimageRead.toString("base64") === fileread.toString("base64");
+
+  fileData.push({ name: filename });
 
   if (isExistNoImage) {
     const filenameSplit = filename.split("_");
@@ -89,8 +92,6 @@ async function worker({ filename, noimageRead, files }) {
 const queue = fastq.promise(worker, CONCURRENCY);
 
 async function exec() {
-  var fileData = [];
-
   const noimageRead = await readFile(noimage);
   const files = await readdir(dirPath);
 
